@@ -1,11 +1,12 @@
 package com.application.bookMyShow.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.el.stream.Optional;
 
 import java.util.List;
 
@@ -15,12 +16,13 @@ import java.util.List;
 public class Theatre extends BaseModel{
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Screen> screens;
 
-    //me
-    @ManyToOne
-    @JoinColumn(name = "city_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "city_id",nullable = false)
+    @JsonBackReference   // Or use @JsonIgnore
     private City cityId;
 }
 

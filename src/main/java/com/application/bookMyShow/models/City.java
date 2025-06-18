@@ -1,9 +1,13 @@
 package com.application.bookMyShow.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.el.stream.Optional;
 
 import java.util.List;
 
@@ -14,6 +18,7 @@ import java.util.List;
 public class City extends BaseModel{
     private String name;
 
-    @OneToMany(mappedBy = "cityId")
+    @OneToMany(mappedBy = "cityId",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference
     private List<Theatre> theatres;
 }

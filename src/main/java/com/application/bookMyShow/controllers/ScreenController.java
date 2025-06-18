@@ -1,8 +1,8 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.TheatreRequestDto;
-import com.application.bookMyShow.dtos.TheatreResponseDto;
-import com.application.bookMyShow.services.TheatreService;
+import com.application.bookMyShow.dtos.ScreenRequestDto;
+import com.application.bookMyShow.dtos.ScreenResponseDto;
+import com.application.bookMyShow.services.ScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("theatre")
-public class TheatreController {
+@RequestMapping("screen")
+public class ScreenController {
     @Autowired
-    private TheatreService theatreService;
+    private ScreenService screenService;
 
     @PostMapping("/add")
-    public ResponseEntity<TheatreResponseDto> addTheatre(@RequestBody TheatreRequestDto requestDto){
-       return theatreService.addTheatre(requestDto);
+    public ResponseEntity<ScreenResponseDto> addScreen(@RequestBody ScreenRequestDto requestDto){
+        return screenService.addScreen(requestDto);
     }
 }

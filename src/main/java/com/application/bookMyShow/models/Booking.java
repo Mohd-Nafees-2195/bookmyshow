@@ -14,10 +14,16 @@ public class Booking extends BaseModel{
     private String bookingNumber;
 
     @ManyToMany
+    @JoinTable(
+            name = "booking_showsheet", // Name of the join table
+            joinColumns = @JoinColumn(name = "booking_id"), // Foreign key in join table for Student
+            inverseJoinColumns = @JoinColumn(name = "showsheet_id") // Foreign key in join table for Course
+    )
     private List<ShowSheet> showSeats;
     private Long amount;
 
     @OneToMany
+    @JoinColumn(name = "booking_id")
     private List<Payment> payments;
 
     @Enumerated(EnumType.ORDINAL)

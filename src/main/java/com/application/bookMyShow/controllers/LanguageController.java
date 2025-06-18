@@ -1,8 +1,8 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.TheatreRequestDto;
-import com.application.bookMyShow.dtos.TheatreResponseDto;
-import com.application.bookMyShow.services.TheatreService;
+import com.application.bookMyShow.dtos.LanguageRequestDto;
+import com.application.bookMyShow.dtos.LanguageResponseDto;
+import com.application.bookMyShow.services.LanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("theatre")
-public class TheatreController {
+@RequestMapping("language")
+public class LanguageController {
+
     @Autowired
-    private TheatreService theatreService;
+    private LanguageService languageService;
 
     @PostMapping("/add")
-    public ResponseEntity<TheatreResponseDto> addTheatre(@RequestBody TheatreRequestDto requestDto){
-       return theatreService.addTheatre(requestDto);
+    public ResponseEntity<LanguageResponseDto> addLanguage(@RequestBody LanguageRequestDto requestDto){
+        return languageService.addLanguage(requestDto);
     }
 }

@@ -1,0 +1,8 @@
+#Define base docker image
+FROM openjdk:17
+
+#Coppy and create the image
+ADD target/bookMyShow-0.0.1-SNAPSHOT.jar book-my-show-docker.jar
+
+#It helps the docker to run the image in docker container
+ENTRYPOINT ["java", "-jar", "book-my-show-docker.jar"]

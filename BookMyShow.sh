@@ -4,6 +4,7 @@ declare postgresql=docker-compose-postgresql.yml
 declare book_my_show=docker-compose-service.yml
 
 function build() {
+    mvn compile
     mvn package -DskipTests
 }
 function start() {

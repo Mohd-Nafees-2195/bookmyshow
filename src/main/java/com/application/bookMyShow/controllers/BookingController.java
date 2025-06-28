@@ -1,8 +1,8 @@
 package com.application.bookMyShow.controllers;
 
 import com.application.bookMyShow.Exceptions.InvalidUserException;
-import com.application.bookMyShow.dtos.UserBookingRequestDto;
-import com.application.bookMyShow.dtos.UserBookingResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserBookingRequestDto;
+import com.application.bookMyShow.dtos.userDtos.UserBookingResponseDto;
 import com.application.bookMyShow.services.UserBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class BookingController {
     @Autowired
     private UserBookingService userBookingService;
 
-    @PostMapping("/book")
+    @PostMapping()
     public ResponseEntity<UserBookingResponseDto> bookTickets(@RequestBody UserBookingRequestDto requestDto) throws InvalidUserException {
         return userBookingService.bookTickets(requestDto);
     }

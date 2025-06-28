@@ -1,7 +1,8 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.UserRequestDto;
-import com.application.bookMyShow.dtos.UserResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserRequestDto;
+import com.application.bookMyShow.dtos.userDtos.UserResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserResponseDtos;
 import com.application.bookMyShow.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,17 +11,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("users")
 public class UserController {
 
     @Autowired
     UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<UserResponseDto> saveUser(@RequestBody UserRequestDto userRequestDto){
         return userService.saveUser(userRequestDto);
     }
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id,@RequestBody UserRequestDto userRequestDto){
         return userService.updateUser(userRequestDto,id);
     }
@@ -28,11 +29,11 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id){
         return userService.getUser(id);
     }
-    @GetMapping("/all")
-    public ResponseEntity<List<UserResponseDto>> getAllUser(){
+    @GetMapping()
+    public ResponseEntity<UserResponseDtos> getAllUser(){
         return userService.getAllUser();
     }
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id){
         return userService.deleteUser(id);
     }

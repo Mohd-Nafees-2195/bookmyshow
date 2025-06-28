@@ -1,7 +1,9 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.*;
-import com.application.bookMyShow.dtos.*;
+import com.application.bookMyShow.dtos.showDtos.ShowRequestDto;
+import com.application.bookMyShow.dtos.showDtos.ShowResponseDto;
+import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetDto;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;

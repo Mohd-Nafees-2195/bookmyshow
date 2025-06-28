@@ -1,7 +1,6 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.movieLanguageDtos;
 
 import com.application.bookMyShow.models.MovieLanguage;
-import com.application.bookMyShow.models.enums.MovieType;
 import lombok.Data;
 
 @Data

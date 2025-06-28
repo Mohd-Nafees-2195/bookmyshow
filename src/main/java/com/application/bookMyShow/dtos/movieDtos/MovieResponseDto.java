@@ -1,4 +1,4 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.movieDtos;
 
 import com.application.bookMyShow.models.Movie;
 import lombok.Data;

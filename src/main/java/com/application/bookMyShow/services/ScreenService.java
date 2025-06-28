@@ -1,8 +1,8 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidTheatreException;
-import com.application.bookMyShow.dtos.ScreenRequestDto;
-import com.application.bookMyShow.dtos.ScreenResponseDto;
+import com.application.bookMyShow.dtos.screenDtos.ScreenRequestDto;
+import com.application.bookMyShow.dtos.screenDtos.ScreenResponseDto;
 import com.application.bookMyShow.models.Screen;
 import com.application.bookMyShow.models.Seat;
 import com.application.bookMyShow.models.Theatre;

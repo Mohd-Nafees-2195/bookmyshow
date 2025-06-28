@@ -1,16 +1,15 @@
 package com.application.bookMyShow.services;
 
-import com.application.bookMyShow.dtos.UserRequestDto;
-import com.application.bookMyShow.dtos.UserResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserRequestDto;
+import com.application.bookMyShow.dtos.userDtos.UserResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserResponseDtos;
 import com.application.bookMyShow.models.User;
 import com.application.bookMyShow.repositories.UserRepository;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,13 +55,14 @@ public class UserService {
         userResponseDto.setUser(user.get());
         return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
     }
-    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+    public ResponseEntity<UserResponseDtos> getAllUser() {
         List<User> users=userRepository.findAll();
-        List<UserResponseDto> response=new ArrayList<>();
+        UserResponseDtos response=new UserResponseDtos();
+        response.setUserResponseDtos(new ArrayList<>());
         for(User user:users){
             UserResponseDto userResponseDto=new UserResponseDto();
             userResponseDto.setUser(user);
-            response.add(userResponseDto);
+            response.getUserResponseDtos().add(userResponseDto);
         }
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

@@ -1,8 +1,6 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.userDtos;
 
 
-import com.application.bookMyShow.models.ShowSheet;
-import com.application.bookMyShow.models.User;
 import com.application.bookMyShow.models.enums.PaymentMode;
 import lombok.Data;
 

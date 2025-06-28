@@ -1,8 +1,8 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidCityException;
-import com.application.bookMyShow.dtos.TheatreRequestDto;
-import com.application.bookMyShow.dtos.TheatreResponseDto;
+import com.application.bookMyShow.dtos.theatreDtos.TheatreRequestDto;
+import com.application.bookMyShow.dtos.theatreDtos.TheatreResponseDto;
 import com.application.bookMyShow.models.City;
 import com.application.bookMyShow.models.Theatre;
 import com.application.bookMyShow.repositories.CityRepository;

@@ -1,7 +1,6 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.userDtos;
 
 import com.application.bookMyShow.models.Booking;
-import com.application.bookMyShow.models.enums.BookingStatus;
 import lombok.Data;
 
 @Data

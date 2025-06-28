@@ -2,8 +2,8 @@ package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidSeatException;
 import com.application.bookMyShow.Exceptions.InvalidUserException;
-import com.application.bookMyShow.dtos.UserBookingRequestDto;
-import com.application.bookMyShow.dtos.UserBookingResponseDto;
+import com.application.bookMyShow.dtos.userDtos.UserBookingRequestDto;
+import com.application.bookMyShow.dtos.userDtos.UserBookingResponseDto;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.models.enums.BookingStatus;
 import com.application.bookMyShow.models.enums.ShowSeatStatus;

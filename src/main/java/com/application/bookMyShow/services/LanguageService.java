@@ -1,7 +1,7 @@
 package com.application.bookMyShow.services;
 
-import com.application.bookMyShow.dtos.LanguageRequestDto;
-import com.application.bookMyShow.dtos.LanguageResponseDto;
+import com.application.bookMyShow.dtos.languageDtos.LanguageRequestDto;
+import com.application.bookMyShow.dtos.languageDtos.LanguageResponseDto;
 import com.application.bookMyShow.models.Language;
 import com.application.bookMyShow.repositories.LanguageRepository;
 import org.springframework.beans.factory.annotation.Autowired;

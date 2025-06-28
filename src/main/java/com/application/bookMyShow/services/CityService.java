@@ -1,7 +1,7 @@
 package com.application.bookMyShow.services;
 
-import com.application.bookMyShow.dtos.CityRequestDto;
-import com.application.bookMyShow.dtos.CityResponseDto;
+import com.application.bookMyShow.dtos.cityDtos.CityRequestDto;
+import com.application.bookMyShow.dtos.cityDtos.CityResponseDto;
 import com.application.bookMyShow.models.City;
 import com.application.bookMyShow.repositories.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;

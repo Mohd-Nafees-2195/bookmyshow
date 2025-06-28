@@ -2,8 +2,8 @@ package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidSeatException;
 import com.application.bookMyShow.Exceptions.InvalidShowException;
-import com.application.bookMyShow.dtos.ShowSheetRequestDto;
-import com.application.bookMyShow.dtos.ShowSheetResponseDto;
+import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetRequestDto;
+import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetResponseDto;
 import com.application.bookMyShow.models.Seat;
 import com.application.bookMyShow.models.Show;
 import com.application.bookMyShow.models.ShowSheet;

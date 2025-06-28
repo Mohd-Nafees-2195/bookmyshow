@@ -1,12 +1,10 @@
 package com.application.bookMyShow.models;
 
-import com.application.bookMyShow.dtos.UserRequestDto;
+import com.application.bookMyShow.dtos.userDtos.UserRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter

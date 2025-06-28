@@ -1,14 +1,8 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.showDtos;
 
-import com.application.bookMyShow.models.Movie;
-import com.application.bookMyShow.models.Screen;
-import com.application.bookMyShow.models.Show;
+import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetDto;
+import com.application.bookMyShow.dtos.movieLanguageDtos.MovieLanguageDto;
 import com.application.bookMyShow.models.enums.Feature;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.util.List;

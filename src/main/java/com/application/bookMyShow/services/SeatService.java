@@ -1,8 +1,8 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidScreenException;
-import com.application.bookMyShow.dtos.SeatRequestDto;
-import com.application.bookMyShow.dtos.SeatResponseDto;
+import com.application.bookMyShow.dtos.seatDtos.SeatRequestDto;
+import com.application.bookMyShow.dtos.seatDtos.SeatResponseDto;
 import com.application.bookMyShow.models.Screen;
 import com.application.bookMyShow.models.Seat;
 import com.application.bookMyShow.repositories.ScreenRepository;

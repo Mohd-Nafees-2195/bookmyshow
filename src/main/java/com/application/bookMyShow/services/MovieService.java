@@ -1,9 +1,9 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidLanguageException;
-import com.application.bookMyShow.dtos.MovieLanguageDto;
-import com.application.bookMyShow.dtos.MovieRequestDto;
-import com.application.bookMyShow.dtos.MovieResponseDto;
+import com.application.bookMyShow.dtos.movieLanguageDtos.MovieLanguageDto;
+import com.application.bookMyShow.dtos.movieDtos.MovieRequestDto;
+import com.application.bookMyShow.dtos.movieDtos.MovieResponseDto;
 import com.application.bookMyShow.models.Language;
 import com.application.bookMyShow.models.Movie;
 import com.application.bookMyShow.models.MovieLanguage;

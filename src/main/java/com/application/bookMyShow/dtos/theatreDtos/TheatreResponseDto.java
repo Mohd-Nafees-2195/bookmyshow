@@ -1,4 +1,4 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.theatreDtos;
 
 import com.application.bookMyShow.models.Theatre;
 import lombok.Data;

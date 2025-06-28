@@ -1,9 +1,8 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.movieDtos;
 
+import com.application.bookMyShow.dtos.movieLanguageDtos.MovieLanguageDto;
 import com.application.bookMyShow.models.Movie;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class MovieRequestDto {

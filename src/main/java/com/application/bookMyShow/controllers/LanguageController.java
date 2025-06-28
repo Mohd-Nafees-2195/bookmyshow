@@ -1,7 +1,7 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.LanguageRequestDto;
-import com.application.bookMyShow.dtos.LanguageResponseDto;
+import com.application.bookMyShow.dtos.languageDtos.LanguageRequestDto;
+import com.application.bookMyShow.dtos.languageDtos.LanguageResponseDto;
 import com.application.bookMyShow.services.LanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("language")
+@RequestMapping("languages")
 public class LanguageController {
 
     @Autowired
     private LanguageService languageService;
 
-    @PostMapping("/add")
+    @PostMapping()
     public ResponseEntity<LanguageResponseDto> addLanguage(@RequestBody LanguageRequestDto requestDto){
         return languageService.addLanguage(requestDto);
     }

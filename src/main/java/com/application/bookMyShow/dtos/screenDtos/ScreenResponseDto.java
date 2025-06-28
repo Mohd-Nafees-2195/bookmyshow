@@ -1,4 +1,4 @@
-package com.application.bookMyShow.dtos;
+package com.application.bookMyShow.dtos.screenDtos;
 
 import com.application.bookMyShow.models.Screen;
 import lombok.Data;

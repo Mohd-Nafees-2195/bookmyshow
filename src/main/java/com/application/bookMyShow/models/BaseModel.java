@@ -16,10 +16,5 @@ public class BaseModel {
     private Long id;
     private Long created_at;
     private Long updated_at;
-
-    public BaseModel(){}
-    public BaseModel(Long created_at, Long updated_at) {
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-    }
+    private Boolean isDeleted;
 }

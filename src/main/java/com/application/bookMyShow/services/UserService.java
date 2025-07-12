@@ -1,8 +1,6 @@
 package com.application.bookMyShow.services;
 
-import com.application.bookMyShow.dtos.userDtos.UserRequestDto;
-import com.application.bookMyShow.dtos.userDtos.UserResponseDto;
-import com.application.bookMyShow.dtos.userDtos.UserResponseDtos;
+import com.application.bookMyShow.dtos.userDtos.*;
 import com.application.bookMyShow.models.User;
 import com.application.bookMyShow.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,57 +22,63 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public ResponseEntity<UserResponseDto> saveUser(UserRequestDto userRequestDto){
-        Long time = System.currentTimeMillis();
-        String password=passwordEncoder.encode(userRequestDto.getPassword());
-        userRequestDto.setPassword(password);
-        User user=new User(userRequestDto,time);
-        User savedUser= userRepository.save(user);
-        UserResponseDto userResponseDto=new UserResponseDto();
-        userResponseDto.setUser(savedUser);
-        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+    public ResponseEntity<CreateUserResponseDto> saveUser(CreateUserRequestDto request){
+        User newUser=CreateUserRequestDto.convertToUser(request.getUser());
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        newUser.setCreated_at(System.currentTimeMillis());
+        newUser.setUpdated_at(System.currentTimeMillis());
+        newUser.setIsDeleted(false);
+
+        User savedUser= userRepository.save(newUser);
+        CreateUserResponseDto response=new CreateUserResponseDto();
+        response.setUser(CreateUserResponseDto.convertToUserResponseDto(savedUser));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    public ResponseEntity<UserResponseDto> updateUser(UserRequestDto userRequestDto,Long id){
+    public ResponseEntity<UpdateUserResponseDto> updateUser(UpdateUserRequestDto request,Long id){
         Optional<User> savedUser=userRepository.findById(id);
-        UserResponseDto userResponseDto=new UserResponseDto();
+        UpdateUserResponseDto response=new UpdateUserResponseDto();
         if(savedUser.isPresent()){
-            Long time = System.currentTimeMillis();
             User user=savedUser.get();
-            user.setUpdated_at(time);
-            user.setName(userRequestDto.getName());
-            user.setEmail(userRequestDto.getEmail());
-            User updatedUser= userRepository.save(user);
-            userResponseDto.setUser(updatedUser);
-            return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
+            if(StringUtils.hasLength(request.getUser().getName())){
+                user.setName(request.getUser().getName());
+            }
+            if(StringUtils.hasLength(request.getUser().getEmail())){
+                user.setEmail(request.getUser().getEmail());
+            }
+            user.setUpdated_at(System.currentTimeMillis());
+            user= userRepository.save(user);
+            response.setUser(UpdateUserResponseDto.convertTpUserResponseDto(user));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(userResponseDto, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<UserResponseDto> getUser(Long id) {
+    public ResponseEntity<GetUserResponseDto> getUser(Long id) {
         Optional<User> user=userRepository.findById(id);
-        UserResponseDto userResponseDto=new UserResponseDto();
-        userResponseDto.setUser(user.get());
-        return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
-    }
-    public ResponseEntity<UserResponseDtos> getAllUser() {
-        List<User> users=userRepository.findAll();
-        UserResponseDtos response=new UserResponseDtos();
-        response.setUserResponseDtos(new ArrayList<>());
-        for(User user:users){
-            UserResponseDto userResponseDto=new UserResponseDto();
-            userResponseDto.setUser(user);
-            response.getUserResponseDtos().add(userResponseDto);
+        GetUserResponseDto response=new GetUserResponseDto();
+        if(user.isPresent()){
+            response.setUser(GetUserResponseDto.convertToUserResponseDto(user.get()));
+            return new ResponseEntity<>(response,HttpStatus.OK);
         }
+        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    }
+    public ResponseEntity<GetUserResponseDtos> getAllUser() {
+        List<User> users=userRepository.findAll();
+        GetUserResponseDtos response=new GetUserResponseDtos();
+        response.setUsers(new ArrayList<>());
+        users.forEach(user -> {
+            response.getUsers().add(GetUserResponseDtos.convertToUserResponseDto(user));
+        });
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-    public ResponseEntity<UserResponseDto> deleteUser(Long id) {
+    public ResponseEntity<DeletedUserResponseDto> deleteUser(Long id) {
         Optional<User> user=userRepository.findById(id);
-        UserResponseDto userResponseDto=new UserResponseDto();
+        DeletedUserResponseDto response=new DeletedUserResponseDto();
         if(user.isPresent()){
             userRepository.deleteById(id);
-            userResponseDto.setUser(user.get());
-            return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
+            response.setUser(DeletedUserResponseDto.convertToUserResponseDto(user.get()));
+            return new ResponseEntity<>(response,HttpStatus.OK);
         }
-        return new ResponseEntity<>(userResponseDto,HttpStatus.PRECONDITION_FAILED);
+        return new ResponseEntity<>(response,HttpStatus.PRECONDITION_FAILED);
     }
 }

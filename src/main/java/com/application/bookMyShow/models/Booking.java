@@ -22,8 +22,8 @@ public class Booking extends BaseModel{
     private List<ShowSheet> showSeats;
     private Long amount;
 
-    @OneToMany
-    @JoinColumn(name = "booking_id")
+    @OneToMany(mappedBy = "booking")
+//    @JoinColumn(name = "booking_id")
     private List<Payment> payments;
 
     @Enumerated(EnumType.ORDINAL)

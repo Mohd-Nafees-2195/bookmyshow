@@ -2,13 +2,13 @@ package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidSeatException;
 import com.application.bookMyShow.Exceptions.InvalidUserException;
-import com.application.bookMyShow.dtos.userDtos.UserBookingRequestDto;
-import com.application.bookMyShow.dtos.userDtos.UserBookingResponseDto;
+import com.application.bookMyShow.dtos.bookingDto.BookingRequestDto;
+import com.application.bookMyShow.dtos.bookingDto.BookingResponseDto;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.models.enums.BookingStatus;
 import com.application.bookMyShow.models.enums.ShowSeatStatus;
 import com.application.bookMyShow.repositories.ShowSheetRepository;
-import com.application.bookMyShow.repositories.UserBookingRepository;
+import com.application.bookMyShow.repositories.BookingRepository;
 import com.application.bookMyShow.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,13 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserBookingService {
     @Autowired
-    private UserBookingRepository userBookingRepository;
+    private BookingRepository bookingRepository;
 
     @Autowired
     private ShowSheetRepository showSheetRepository;
@@ -32,7 +33,7 @@ public class UserBookingService {
     private UserRepository userRepository;
 
     @Transactional
-    public ResponseEntity<UserBookingResponseDto> bookTickets(UserBookingRequestDto requestDto) throws InvalidUserException {
+    public ResponseEntity<BookingResponseDto> bookTickets(BookingRequestDto requestDto) throws InvalidUserException {
         //Validate User
         Optional<User> savedUser=userRepository.findById(requestDto.getUserId());
         if(savedUser.isEmpty()){
@@ -40,20 +41,20 @@ public class UserBookingService {
         }
         //Validate sheets
         List<ShowSheet> showSheets=showSheetRepository.findAllById(requestDto.getShowSheetIds());
-        Long totalPrice= 0L;
+        Long totalAmount= 0L;
         for(ShowSheet showSheet:showSheets){
             if(showSheet.getShowSheetStatus()!=ShowSeatStatus.AVAILABLE){
                 throw new InvalidSeatException("Seat has already been booked");
             }
-            showSheet.setShowSheetStatus(ShowSeatStatus.BOOKED);
-            totalPrice+=showSheet.getPrice();//total price
+            showSheet.setShowSheetStatus(ShowSeatStatus.BLOCKED);
+            totalAmount+=showSheet.getPrice();//total price
         }
         Show show=showSheets.get(0).getShow();
         Booking booking=new Booking();
         booking.setShowSeats(showSheets);
         String bookingNumber=requestDto.getUserId()+"_"+show.getId()+"_"+Math.random();
         booking.setBookingNumber(bookingNumber);
-        booking.setAmount(totalPrice);
+        booking.setAmount(totalAmount);
 
         List<Payment> payments=new ArrayList<>();
 //        Payment payment=new Payment();
@@ -68,15 +69,13 @@ public class UserBookingService {
         booking.setPayments(payments);
        // if(payment.getPaymentStatus()==PaymentStatus.PAID){
         showSheetRepository.saveAll(showSheets);
-        booking.setBookingStatus(BookingStatus.CONFIRMED);
-        Long time=System.currentTimeMillis();
-        booking.setCreated_at(time);
-        booking.setUpdated_at(time);
+        booking.setBookingStatus(BookingStatus.PENDING);
+        booking.setCreated_at(new Date());
+        booking.setUpdated_at(new Date());
         booking.setUser(savedUser.get());
-        userBookingRepository.save(booking);
+        booking= bookingRepository.save(booking);
     //    }
-        UserBookingResponseDto responseDto=new UserBookingResponseDto();
-        responseDto.setBooking(booking);
+        BookingResponseDto responseDto= BookingResponseDto.convertToUserBookingResponseDto(booking);
         return new  ResponseEntity<>(responseDto,HttpStatus.OK );
     }
 }

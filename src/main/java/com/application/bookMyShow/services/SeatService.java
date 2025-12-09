@@ -1,8 +1,7 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.InvalidScreenException;
-import com.application.bookMyShow.dtos.seatDtos.SeatRequestDto;
-import com.application.bookMyShow.dtos.seatDtos.SeatResponseDto;
+import com.application.bookMyShow.dtos.seatDtos.*;
 import com.application.bookMyShow.models.Screen;
 import com.application.bookMyShow.models.Seat;
 import com.application.bookMyShow.repositories.ScreenRepository;
@@ -12,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,20 +25,48 @@ public class SeatService {
     @Autowired
     private ScreenRepository screenRepository;
 
-    public ResponseEntity<SeatResponseDto> addSeat(SeatRequestDto requestDto) {
+    public ResponseEntity<CreateSeatResponseDto> addSeat(SeatRequestDto requestDto) {
         Optional<Screen> screen=screenRepository.findById(requestDto.getScreenId());
         if(screen.isEmpty()){
             throw new InvalidScreenException("Invalid Screen Exception");
         }
-        Seat seat= requestDto.getSeat();
-        Long time=System.currentTimeMillis();
-        seat.setCreated_at(time);
-        seat.setUpdated_at(time);
+        Seat seat= SeatRequestDto.convertToSeat(requestDto);
+        seat.setCreated_at(new Date());
+        seat.setUpdated_at(new Date());
         seat.setScreen(screen.get());
-        seatRepository.save(seat);
-        SeatResponseDto responseDto=new SeatResponseDto();
-        responseDto.setSeat(seat);
-        responseDto.setMessage("Seat Added Successfully!!");
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        seat=seatRepository.save(seat);
+        CreateSeatResponseDto response=new CreateSeatResponseDto();
+        response.setSeat(SeatResponseDto.convertToSeatResponseDto(seat));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GetSeatResponseDto> getSeat(Long id) {
+        Optional<Seat> seat=seatRepository.findById(id);
+        if(seat.isEmpty()){
+            throw new InvalidScreenException("Invalid Seat Exception");
+        }
+        GetSeatResponseDto response=new GetSeatResponseDto();
+        response.setSeat(SeatResponseDto.convertToSeatResponseDto(seat.get()));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<SeatResponseDtos> getAllSeat() {
+        List<Seat> seats=seatRepository.findAll();
+        if(seats.isEmpty()){
+            throw new InvalidScreenException("No Seat Found");
+        }
+        SeatResponseDtos response=new SeatResponseDtos();
+        response.setSeats(new ArrayList<>());
+        seats.forEach(seat -> response.getSeats().add(SeatResponseDto.convertToSeatResponseDto(seat)));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public Boolean deleteSeat(Long id) {
+        try{
+            seatRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

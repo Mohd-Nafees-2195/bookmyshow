@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +28,13 @@ public class TheatreService {
 
     public ResponseEntity<CreateTheatreResponseDto> addTheatre(CreateTheatreRequestDto request) {
         //1 check city
-        Optional<City> city= cityRepository.findById(request.getTheatre().getId());
+        Optional<City> city= cityRepository.findById(request.getTheatre().getCityId());
         if(city.isEmpty()){
             throw new InvalidCityException("Invalid City");
         }
         Theatre theatre=CreateTheatreRequestDto.convertToTheatre(request.getTheatre());
-        theatre.setCreated_at(System.currentTimeMillis());
-        theatre.setUpdated_at(System.currentTimeMillis());
+        theatre.setCreated_at(new Date());
+        theatre.setUpdated_at(new Date());
         theatre.setCityId(city.get());
         theatre=theatreRepository.save(theatre);
         CreateTheatreResponseDto response=new CreateTheatreResponseDto();
@@ -56,7 +57,7 @@ public class TheatreService {
         GetTheatreResponseDtos response=new GetTheatreResponseDtos();
         response.setTheatres(new ArrayList<>());
         theatres.forEach((theatre -> {
-            response.getTheatres().add(GetTheatreResponseDtos.convertToTheatreResponseDto(theatre));
+            response.getTheatres().add(TheatreResponseDto.convertToTheatreResponseDto(theatre));
         }));
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

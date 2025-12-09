@@ -1,7 +1,6 @@
 package com.application.bookMyShow.models;
 
 import com.application.bookMyShow.models.enums.MovieStatus;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,12 +12,40 @@ import java.util.List;
 @Setter
 public class Movie extends BaseModel {
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+    private Long runtime;
+    private String imageUrl;
 
     @Enumerated(EnumType.ORDINAL)
     private MovieStatus movieStatus;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "movie-language")
-    private List<MovieLanguage> languages;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "movie_language",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id")
+    )
+    private List<Languages> languages;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "movie_genres",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genres_id")
+    )
+    private List<Genres> genres;
+
+//    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+//    @JsonManagedReference(value = "movie-language")
+//    private List<MovieLanguage> languages;
+//
+////    @OneToOne
+////    private Images images;
+//
+//    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+//    @JsonManagedReference(value = "movie-genres")
+//    private List<MovieGenres> genres;
+
 }

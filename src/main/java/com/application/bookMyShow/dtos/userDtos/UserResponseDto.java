@@ -3,13 +3,15 @@ package com.application.bookMyShow.dtos.userDtos;
 import com.application.bookMyShow.models.User;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class UserResponseDto {
     private Long id;
     private String name;
     private String email;
-    private Long created_at;
-    private Long updated_at;
+    private Date created_at;
+    private Date updated_at;
 
     public static UserResponseDto convertTOUserResponseDto(User user){
         UserResponseDto response=new UserResponseDto();

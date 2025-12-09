@@ -1,14 +1,13 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.movieDtos.MovieRequestDto;
-import com.application.bookMyShow.dtos.movieDtos.MovieResponseDto;
+import com.application.bookMyShow.dtos.movieDtos.*;
 import com.application.bookMyShow.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("movies")
@@ -17,8 +16,18 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
-    @PostMapping()
-    public ResponseEntity<MovieResponseDto> addMovie(@RequestBody MovieRequestDto requestDto){
-        return movieService.addMovie(requestDto);
+    @PostMapping
+    public ResponseEntity<CreateMovieResponseDto> addMovie(@RequestBody CreateMovieRequestDto request){
+        return movieService.addMovie(request.getMovie());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetMovieResponseDto> getMovie(@PathVariable Long id){
+        return movieService.getMovie(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<MovieResponseDtos> getAllMovie(){
+        return movieService.getAllMovie();
     }
 }

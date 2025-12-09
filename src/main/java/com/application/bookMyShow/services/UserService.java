@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +26,8 @@ public class UserService {
     public ResponseEntity<CreateUserResponseDto> saveUser(CreateUserRequestDto request){
         User newUser=CreateUserRequestDto.convertToUser(request.getUser());
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        newUser.setCreated_at(System.currentTimeMillis());
-        newUser.setUpdated_at(System.currentTimeMillis());
+        newUser.setCreated_at(new Date());
+        newUser.setUpdated_at(new Date());
         newUser.setIsDeleted(false);
 
         User savedUser= userRepository.save(newUser);
@@ -45,7 +46,7 @@ public class UserService {
             if(StringUtils.hasLength(request.getUser().getEmail())){
                 user.setEmail(request.getUser().getEmail());
             }
-            user.setUpdated_at(System.currentTimeMillis());
+            user.setUpdated_at(new Date());
             user= userRepository.save(user);
             response.setUser(UpdateUserResponseDto.convertTpUserResponseDto(user));
             return new ResponseEntity<>(response, HttpStatus.OK);

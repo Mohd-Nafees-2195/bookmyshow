@@ -1,4 +1,4 @@
-# How to set up this application int local 
+# How to set up this application into local 
 * Install java openjdk 17.0.15
 * Install Apache Maven 3.6.3
 * Install docker and docker compose

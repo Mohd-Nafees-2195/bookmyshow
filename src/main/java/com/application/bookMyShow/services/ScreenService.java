@@ -1,8 +1,9 @@
 package com.application.bookMyShow.services;
 
+import com.application.bookMyShow.Exceptions.InvalidScreenException;
 import com.application.bookMyShow.Exceptions.InvalidTheatreException;
-import com.application.bookMyShow.dtos.screenDtos.ScreenRequestDto;
-import com.application.bookMyShow.dtos.screenDtos.ScreenResponseDto;
+import com.application.bookMyShow.dtos.screenDtos.*;
+import com.application.bookMyShow.dtos.seatDtos.SeatRequestDto;
 import com.application.bookMyShow.models.Screen;
 import com.application.bookMyShow.models.Seat;
 import com.application.bookMyShow.models.Theatre;
@@ -13,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,28 +28,50 @@ public class ScreenService {
     @Autowired
     private TheatreRepository theatreRepository;
 
-    public ResponseEntity<ScreenResponseDto> addScreen(ScreenRequestDto requestDto) {
-        Screen screen=new Screen();
-        screen.setName(requestDto.getScreenName());
-        Optional<Theatre> theatre= theatreRepository.findById(requestDto.getTheatreId());
+    public ResponseEntity<CreateScreenResponseDto> addScreen(ScreenRequestDto request) {
+        Screen screen=ScreenRequestDto.convertToScreen(request);
+        Optional<Theatre> theatre= theatreRepository.findById(request.getTheatreId());
         if(theatre.isEmpty()){
             throw new InvalidTheatreException("Invalid Theatre");
         }
         screen.setTheatre(theatre.get());
-        Long time = System.currentTimeMillis();
-        for(Seat seat:requestDto.getSeats()){
-            seat.setCreated_at(time);
-            seat.setUpdated_at(time);
-            seat.setScreen(screen);
-        }
-        screen.setSeats(requestDto.getSeats());
-        screen.setCreated_at(time);
-        screen.setUpdated_at(time);
 
-        screenRepository.save(screen);
-        ScreenResponseDto responseDto=new ScreenResponseDto();
-        responseDto.setScreen(screen);
-        responseDto.setMessage("Screen Added Successfully");
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        List<Seat> seats=new ArrayList<>();
+        for(SeatRequestDto seatDto:request.getSeats()){
+            Seat seat=SeatRequestDto.convertToSeat(seatDto);
+            seat.setCreated_at(new Date());
+            seat.setUpdated_at(new Date());
+            seat.setScreen(screen);
+            seats.add(seat);
+        }
+        screen.setSeats(seats);
+        screen.setCreated_at(new Date());
+        screen.setUpdated_at(new Date());
+        screen.setFeatures(request.getFeatures());
+        screen=screenRepository.save(screen);
+        CreateScreenResponseDto response=new CreateScreenResponseDto();
+        response.setScreen(ScreenResponseDto.convertToScreenResponseDto(screen));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GetScreenResponseDto> getScreen(Long id) {
+        Optional<Screen> screen=screenRepository.findById(id);
+        if(screen.isEmpty()){
+            throw new InvalidScreenException("Screen not found");
+        }
+        GetScreenResponseDto response=new GetScreenResponseDto();
+        response.setScreen(ScreenResponseDto.convertToScreenResponseDto(screen.get()));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<ScreenResponseDtos> getAllScreen() {
+        List<Screen> screens=screenRepository.findAll();
+        if(screens.isEmpty()){
+            throw new InvalidScreenException("No screen found");
+        }
+        ScreenResponseDtos response=new ScreenResponseDtos();
+        response.setScreens(new ArrayList<>());
+        screens.forEach(screen -> response.getScreens().add(ScreenResponseDto.convertToScreenResponseDto(screen)));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

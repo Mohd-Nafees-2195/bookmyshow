@@ -5,14 +5,12 @@ import lombok.Data;
 
 @Data
 public class TheatreRequestDto {
-    private Long id;
     private Long cityId;
-    private String theatreName;
+    private String name;
 
     public static Theatre convertToTheatre(TheatreRequestDto request){
         Theatre newTheatre=new Theatre();
-        newTheatre.setId(request.getId());
-        newTheatre.setName(request.getTheatreName());
+        newTheatre.setName(request.getName());
         return newTheatre;
     }
 }

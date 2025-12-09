@@ -1,8 +1,8 @@
 package com.application.bookMyShow.services;
 
 import com.application.bookMyShow.Exceptions.*;
-import com.application.bookMyShow.dtos.showDtos.ShowRequestDto;
-import com.application.bookMyShow.dtos.showDtos.ShowResponseDto;
+import com.application.bookMyShow.dtos.ShowTimingDtos.ShowTimingRequestDto;
+import com.application.bookMyShow.dtos.showDtos.*;
 import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetDto;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.repositories.*;
@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class ShowService {
@@ -25,78 +27,195 @@ public class ShowService {
     @Autowired
     private ScreenRepository screenRepository;
     @Autowired
-    private LanguageRepository languageRepository;
-    @Autowired
-    private MovieLanguageRepository movieLanguageRepository;
-    @Autowired
     private ShowSheetRepository showSheetRepository;
 
-    public ResponseEntity<ShowResponseDto> addShow(ShowRequestDto requestDto) {
-        //Check the show timing availability in the selected screen.
-        List<Show> shows=showRepository.findAllByScreenId(requestDto.getScreenId(),requestDto.getStartTime(),requestDto.getEndTime());
-        //if show is not conflicting then create the show else throw the exception slot not available
-        if(!shows.isEmpty()){
-            throw new InvalidSlotException("Timing slot is not available");
-        }
+//    @Autowired
+//    private TheatreRepository theatreRepository;
+
+    public ResponseEntity<CreateShowResponseDto> addShow(CreateShowRequestDto request) {
+
         //Fetch the movie
-        Optional<Movie> movie=movieRepository.findById(requestDto.getMovieId());
+        Optional<Movie> movie=movieRepository.findById(request.getShow().getMovieId());
         if(movie.isEmpty()){
-            throw new InvalidMovieException("Invalid movie selectin");
+            throw new InvalidMovieException("Invalid movie selection");
         }
         //Fetch the screen
-        Optional<Screen> screen=screenRepository.findById(requestDto.getScreenId());
+        Optional<Screen> screen=screenRepository.findById(request.getShow().getScreenId());
         if(screen.isEmpty()){
             throw new InvalidScreenException("Invalid screen selection");
         }
-        //Fetch Language
-//        MovieLanguageDto movieLanguageDto=requestDto.getMovieLanguageDto();
-//        Optional<Language> language=languageRepository.findById(movieLanguageDto.getLanguageId());
-//        if(language.isEmpty()){
-//            throw new InvalidLanguageException("Invalid Language");
-//        }
-//        //Add movie_language first
-//        MovieLanguage movieLanguage=new MovieLanguage();
-//        movieLanguage.setLanguage(language.get());
-//        movieLanguage.setMovie(movie.get());
-//        movieLanguage.setMovieType(movieLanguageDto.getMovieType());
-//        movieLanguage.setSubtitle(movieLanguageDto.getIsSubtitle());
-//        movieLanguage.setAudio(movieLanguageDto.getIsAudio());
-//        movieLanguageRepository.save(movieLanguage);
 
+        //Fetch Theatre
+        List<Show> shows=showRepository.findByScreen_Theatre_Id(request.getShow().getTheatreId());
+        //Check the show timing availability in the selected screen.
+        //if show is not conflicting then create the show else throw the exception slot not available
+        if(!shows.isEmpty()){
+            long bufferMillis = 15 * 60 * 1000; // 15 minutes in milliseconds
+            for (Show show : shows) {
+                if(Objects.equals(request.getShow().getScreenId(), show.getScreen().getId())){
+//                    for (ShowTiming existingTiming : show.getShowTimings()) {
+                        for (ShowTimingRequestDto newTiming : request.getShow().getShowTimings()) {
 
-        Show newShow=new Show();
-        newShow.setScreen(screen.get());
-        newShow.setMovie(movie.get());
-        newShow.setFeatures(requestDto.getFeatures());
-        newShow.setStartTime(requestDto.getStartTime());
-        newShow.setEndTime(requestDto.getEndTime());
-        Long time=System.currentTimeMillis();
-        newShow.setCreated_at(time);
-        newShow.setUpdated_at(time);
-        showRepository.save(newShow);
+                            Date newStart = newTiming.getStartTime();
+                            Date newEnd = newTiming.getEndTime();
+                            Date existingStart = show.getStartTime();
+                            Date existingEnd = show.getEndTime();
 
-        //Now Add record into show_sheet
-        List<ShowSheetDto> showSheetDtos=requestDto.getShowSheetDtos();
-        List<ShowSheet> showSheets=new ArrayList<>();
+                            // Apply buffer to existing start and end
+                            Date existingStartWithBuffer = new Date(existingStart.getTime() - bufferMillis);
+                            Date existingEndWithBuffer = new Date(existingEnd.getTime() + bufferMillis);
+
+                            // Check for conflict
+                            if (newStart.before(existingEndWithBuffer) && newEnd.after(existingStartWithBuffer)) {
+                                throw new InvalidSlotException("Conflict with existing show! "+newStart+" to "+newEnd);
+                                // Handle conflict (return error or skip)
+                            }
+                        }
+                }else{
+                    //Check only for date
+                    long bufferMinutes=14L;
+//                    for (ShowTiming existingTiming : show.getShowTimings()) {
+                        for (ShowTimingRequestDto newTiming : request.getShow().getShowTimings()) {
+                            LocalDate newLocalStartDate=toLocalDate(newTiming.getStartTime());
+                            LocalDate newLocalEndDate=toLocalDate(newTiming.getEndTime());
+                            LocalDate existLocalStartDate=toLocalDate(show.getStartTime());
+                            LocalDate existLocalEndDate=toLocalDate(show.getEndTime());
+
+                            if(newLocalStartDate.equals(existLocalStartDate)&&newLocalEndDate.equals(existLocalEndDate)){
+                                LocalTime newStart = toLocalTimeHM(newTiming.getStartTime());
+                                LocalTime newEnd   = toLocalTimeHM(newTiming.getEndTime());
+                                LocalTime existingStart = toLocalTimeHM(show.getStartTime());
+                                //LocalTime existingEnd   = toLocalTimeHM(existingTiming.getEndTime());
+
+                                // Apply buffer in minutes
+                                LocalTime existingStartWithBuffer = existingStart.minusMinutes(bufferMinutes);
+                                LocalTime existingEndWithBuffer   = existingStart.plusMinutes(bufferMinutes);
+
+                                System.out.println(existingStartWithBuffer+" - "+existingEndWithBuffer);
+
+                                // Conflict check
+                                boolean overlaps = newStart.isBefore(existingEndWithBuffer)
+                                        && newStart.isAfter(existingStartWithBuffer);
+
+                                if (overlaps) {
+                                    throw new InvalidSlotException(
+                                            "Conflict with existing show! " + newStart + " to " + newEnd
+                                    );
+                                }
+                            }
+                        }
+                }
+            }
+        }
+
+        List<ShowSheetDto> showSheetDtos=request.getShow().getShowSheets();
         List<Seat> seats=screen.get().getSeats();
-        int i=0;
         if(seats.size()!=showSheetDtos.size()){
             throw new InvalidSeatException("Seat is missing");
         }
-        for(ShowSheetDto seat:showSheetDtos){
-            ShowSheet showSheet=new ShowSheet();
-            showSheet.setShow(newShow);
-            showSheet.setSeat(seats.get(i++));
-            showSheet.setPrice(seat.getPrice());
-            showSheet.setShowSheetStatus(seat.getShowSheetStatus());
-            showSheet.setCreated_at(time);
-            showSheet.setUpdated_at(time);
-            showSheets.add(showSheet);
+        CreateShowResponseDto response=new CreateShowResponseDto();
+        response.setShows(new ArrayList<>());
+        for(ShowTimingRequestDto timingDto:request.getShow().getShowTimings()){
+            Show newShow= ShowRequestDto.convertToShow(request.getShow());
+            newShow.setScreen(screen.get());
+            newShow.setMovie(movie.get());
+            newShow.setCreated_at(new Date());
+            newShow.setUpdated_at(new Date());
+            newShow.setIsDeleted(false);
+            newShow.setStartTime(timingDto.getStartTime());
+            newShow.setEndTime(timingDto.getEndTime());
+            newShow=showRepository.save(newShow);
+
+            //Now Add record into show_sheet
+            List<ShowSheet> showSheets=new ArrayList<>();
+            int i=0;
+            for(ShowSheetDto seat:showSheetDtos){
+                ShowSheet showSheet=new ShowSheet();
+                showSheet.setShow(newShow);
+                showSheet.setSeat(seats.get(i++));
+                showSheet.setPrice(seat.getPrice());
+                showSheet.setShowSheetStatus(seat.getShowSheetStatus());
+                showSheet.setCreated_at(new Date());
+                showSheet.setUpdated_at(new Date());
+                showSheets.add(showSheet);
+            }
+            showSheets=showSheetRepository.saveAll(showSheets);
+            ShowResponseDto showResponse=ShowResponseDto.convertToShowResponseDto(newShow);
+            for(int j=0;j<showSheets.size();j++){
+                showSheetDtos.get(j).setSeatId(showSheets.get(j).getId());
+            }
+            showResponse.setShowSheets(showSheetDtos);
+            response.getShows().add(showResponse);
         }
-        showSheetRepository.saveAll(showSheets);
-        ShowResponseDto responseDto=new ShowResponseDto();
-        responseDto.setShow(newShow);
-        responseDto.setMessage("Show Added Successfully");
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<GetShowResponseDto> getShow(Long id) {
+        Optional<Show> show=showRepository.findById(id);
+        if(show.isEmpty()){
+            throw new InvalidShowException("Invalid Show!! Show Not Found");
+        }
+        GetShowResponseDto response=new GetShowResponseDto();
+        response.setShow(CreateShowResponseDto.convertToShowResponseDto(show.get()));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<ShowResponseDtos> getAllShow() {
+        List<Show> shows=showRepository.findAll();
+        if(shows.isEmpty()){
+            throw new InvalidShowException("Show Not Available");
+        }
+        ShowResponseDtos response=new ShowResponseDtos();
+        response.setShows(new ArrayList<>());
+        shows.forEach(show -> response.getShows().add(ShowResponseDto.convertToShowResponseDto(show)));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<ShowResponseDtos> getAllShowByMovieIdAndDate(Long movieId,String date) {
+        List<Show> shows=showRepository.findByMovieIdAndIsDeleted(movieId,false);
+        if(shows.isEmpty()){
+            throw new InvalidShowException("Show Not Available");
+        }
+        List<ShowResponseDto> showsList=new ArrayList<>();
+        ShowResponseDtos response=new ShowResponseDtos();
+        response.setShows(showsList);
+        shows.forEach(show -> response.getShows().add(ShowResponseDto.convertToShowResponseDto(show)));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<ShowResponseDtos> getAllShowByMovieId(Long movieId) {
+        List<Show> shows=showRepository.findByMovieIdAndIsDeleted(movieId,false);
+        if(shows.isEmpty()){
+            throw new InvalidShowException("Show Not Available");
+        }
+        ShowResponseDtos response=new ShowResponseDtos();
+        response.setShows(new ArrayList<>());
+        shows.forEach(show -> response.getShows().add(ShowResponseDto.convertToShowResponseDto(show)));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<ShowResponseDtos> getAllShowByTheatreIds(List<Long> theatreIds) {
+        List<Show> shows=showRepository.findAllByScreen_Theatre_IdIn(theatreIds);
+        if(shows.isEmpty()){
+            throw new InvalidShowException("No show found!!");
+        }
+        ShowResponseDtos response=new ShowResponseDtos();
+        response.setShows(new ArrayList<>());
+        shows.forEach(show -> response.getShows().add(ShowResponseDto.convertToShowResponseDto(show)));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    private LocalTime toLocalTimeHM(Date date) {
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault()) // or ZoneId.of("UTC")
+                .toLocalTime()
+                .truncatedTo(ChronoUnit.MINUTES); // drop seconds & millis
+    }
+    private LocalDate toLocalDate(Date date){
+        // or ZoneId.of("UTC")
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault()) // or ZoneId.of("UTC")
+                .toLocalDate();
+    }
+
 }

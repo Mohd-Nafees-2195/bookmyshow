@@ -1,20 +1,19 @@
 package com.application.bookMyShow.services;
 
+import com.application.bookMyShow.Exceptions.InvalidGenresException;
 import com.application.bookMyShow.Exceptions.InvalidLanguageException;
-import com.application.bookMyShow.dtos.movieLanguageDtos.MovieLanguageDto;
-import com.application.bookMyShow.dtos.movieDtos.MovieRequestDto;
-import com.application.bookMyShow.dtos.movieDtos.MovieResponseDto;
-import com.application.bookMyShow.models.Language;
-import com.application.bookMyShow.models.Movie;
-import com.application.bookMyShow.models.MovieLanguage;
-import com.application.bookMyShow.repositories.LanguageRepository;
-import com.application.bookMyShow.repositories.MovieLanguageRepository;
-import com.application.bookMyShow.repositories.MovieRepository;
+import com.application.bookMyShow.Exceptions.InvalidMovieException;
+import com.application.bookMyShow.dtos.movieDtos.*;
+import com.application.bookMyShow.models.*;
+import com.application.bookMyShow.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,34 +24,64 @@ public class MovieService {
     @Autowired
     private LanguageRepository languageRepository;
     @Autowired
-    private MovieLanguageRepository movieLanguageRepository;
+    private ImageRepository imageRepository;
 
-    public ResponseEntity<MovieResponseDto> addMovie(MovieRequestDto requestDto) {
+    @Autowired
+    private GenresRepository genresRepository;
 
-        Movie movie=requestDto.getMovie();
-        Long time=System.currentTimeMillis();
-        movie.setCreated_at(time);
-        movie.setUpdated_at(time);
-        movieRepository.save(movie);
 
-        //Fetch Language
-        MovieLanguageDto movieLanguageDto=requestDto.getMovieLanguageDto();
-        Optional<Language> language=languageRepository.findById(movieLanguageDto.getLanguageId());
-        if(language.isEmpty()){
-            throw new InvalidLanguageException("Invalid Language");
+    public ResponseEntity<CreateMovieResponseDto> addMovie(MovieRequestDto request) {
+
+        try{
+
+            //Fetch Genres
+            Iterable<Long> genresId=request.getGenresIds();
+            List<Genres> genres=genresRepository.findAllById(genresId);
+            if(genres.isEmpty()){
+                throw new InvalidGenresException("At-least one genre required!!");
+            }
+
+            //Fetch Languages
+            Iterable<Long> languagesIds=request.getLanguageIds();
+            List<Languages> languages=languageRepository.findAllById(languagesIds);
+            if(languages.isEmpty()){
+                throw new InvalidLanguageException("At-least one language required!!");
+            }
+
+            //Create Movie Object
+            Movie movie=MovieRequestDto.convertToMovie(request);
+            movie.setCreated_at(new Date());
+            movie.setUpdated_at(new Date());
+            movie.setGenres(genres);
+            movie.setLanguages(languages);
+            movie=movieRepository.save(movie);
+
+            CreateMovieResponseDto response=new CreateMovieResponseDto();
+            response.setMovie(MovieResponseDto.convertToMovieResponseDto(movie));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        //Add movie_language first
-        MovieLanguage movieLanguage=new MovieLanguage();
-        movieLanguage.setLanguage(language.get());
-        movieLanguage.setMovie(movie);
-        movieLanguage.setMovieType(movieLanguageDto.getMovieType());
-        movieLanguage.setSubtitle(movieLanguageDto.getIsSubtitle());
-        movieLanguage.setAudio(movieLanguageDto.getIsAudio());
-        movieLanguageRepository.save(movieLanguage);
+    }
 
-        MovieResponseDto responseDto=new MovieResponseDto();
-        responseDto.setMovie(movie);
-        responseDto.setMessage("Movie added successfully!!");
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    public ResponseEntity<GetMovieResponseDto> getMovie(Long id) {
+        Optional<Movie> movie=movieRepository.findById(id);
+        if(movie.isEmpty()){
+            throw new InvalidMovieException("Movie Not Found");
+        }
+        GetMovieResponseDto response=new GetMovieResponseDto();
+        response.setMovie(MovieResponseDto.convertToMovieResponseDto(movie.get()));
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<MovieResponseDtos> getAllMovie() {
+        List<Movie> movies=movieRepository.findAll();
+        MovieResponseDtos response=new MovieResponseDtos();
+        response.setMovies(new ArrayList<>());
+        movies.forEach(movie -> {
+            MovieResponseDto movieDto=MovieResponseDto.convertToMovieResponseDto(movie);
+            response.getMovies().add(movieDto);
+        });
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

@@ -22,7 +22,6 @@ public class Theatre extends BaseModel{
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "city_id",nullable = false)
-    @JsonBackReference   // Or use @JsonIgnore
     private City cityId;
 }
 

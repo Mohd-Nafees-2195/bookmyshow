@@ -19,6 +19,10 @@ public class Screen extends BaseModel{
     @JsonManagedReference
     private List<Seat> seats;
 
+    @OneToMany(mappedBy = "screen", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Show> shows;
+
     @Enumerated(EnumType.ORDINAL)
     @ElementCollection
     private List<Feature> features;

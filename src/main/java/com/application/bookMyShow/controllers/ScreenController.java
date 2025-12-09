@@ -1,23 +1,30 @@
 package com.application.bookMyShow.controllers;
 
-import com.application.bookMyShow.dtos.screenDtos.ScreenRequestDto;
-import com.application.bookMyShow.dtos.screenDtos.ScreenResponseDto;
+import com.application.bookMyShow.dtos.screenDtos.*;
 import com.application.bookMyShow.services.ScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("screens")
+@RequestMapping("/screens")
 public class ScreenController {
     @Autowired
     private ScreenService screenService;
 
-    @PostMapping()
-    public ResponseEntity<ScreenResponseDto> addScreen(@RequestBody ScreenRequestDto requestDto){
-        return screenService.addScreen(requestDto);
+    @PostMapping
+    public ResponseEntity<CreateScreenResponseDto> addScreen(@RequestBody CreateScreenRequestDto request){
+        return screenService.addScreen(request.getScreen());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetScreenResponseDto> getScreen(@PathVariable Long id){
+        return screenService.getScreen(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<ScreenResponseDtos> getAllScreen(){
+        return screenService.getAllScreen();
+    }
+
 }

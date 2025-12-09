@@ -19,6 +19,5 @@ public class City extends BaseModel{
     private String name;
 
     @OneToMany(mappedBy = "cityId",cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference
     private List<Theatre> theatres;
 }

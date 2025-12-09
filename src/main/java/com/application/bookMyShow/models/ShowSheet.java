@@ -1,5 +1,6 @@
 package com.application.bookMyShow.models;
 
+import com.application.bookMyShow.models.enums.SeatType;
 import com.application.bookMyShow.models.enums.ShowSeatStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +20,9 @@ public class ShowSheet extends BaseModel {
     private Long price;
     @Enumerated(EnumType.ORDINAL)
     private ShowSeatStatus showSheetStatus;
+
+    @Enumerated(EnumType.ORDINAL)
+    private SeatType seatType;
 }
 
 /*

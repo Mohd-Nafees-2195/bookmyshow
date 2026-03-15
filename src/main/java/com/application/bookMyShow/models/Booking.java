@@ -26,7 +26,10 @@ public class Booking extends BaseModel{
 //    @JoinColumn(name = "booking_id")
     private List<Payment> payments;
 
-    @Enumerated(EnumType.ORDINAL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Show show;
+
+    @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
     @ManyToOne

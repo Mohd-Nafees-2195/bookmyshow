@@ -4,6 +4,7 @@ import com.application.bookMyShow.Exceptions.InvalidSeatException;
 import com.application.bookMyShow.Exceptions.InvalidUserException;
 import com.application.bookMyShow.dtos.bookingDto.BookingRequestDto;
 import com.application.bookMyShow.dtos.bookingDto.BookingResponseDto;
+import com.application.bookMyShow.dtos.bookingDto.BookingResponseDtos;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.models.enums.BookingStatus;
 import com.application.bookMyShow.models.enums.ShowSeatStatus;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ public class UserBookingService {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED ,isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<BookingResponseDto> bookTickets(BookingRequestDto requestDto) throws InvalidUserException {
         //Validate User
         Optional<User> savedUser=userRepository.findById(requestDto.getUserId());
@@ -46,7 +49,7 @@ public class UserBookingService {
             if(showSheet.getShowSheetStatus()!=ShowSeatStatus.AVAILABLE){
                 throw new InvalidSeatException("Seat has already been booked");
             }
-            showSheet.setShowSheetStatus(ShowSeatStatus.BLOCKED);
+            showSheet.setShowSheetStatus(ShowSeatStatus.PENDING);
             totalAmount+=showSheet.getPrice();//total price
         }
         Show show=showSheets.get(0).getShow();
@@ -55,7 +58,7 @@ public class UserBookingService {
         String bookingNumber=requestDto.getUserId()+"_"+show.getId()+"_"+Math.random();
         booking.setBookingNumber(bookingNumber);
         booking.setAmount(totalAmount);
-
+        booking.setShow(show);
         List<Payment> payments=new ArrayList<>();
 //        Payment payment=new Payment();
 //        payment.setAmount(price);
@@ -77,5 +80,15 @@ public class UserBookingService {
     //    }
         BookingResponseDto responseDto= BookingResponseDto.convertToUserBookingResponseDto(booking);
         return new  ResponseEntity<>(responseDto,HttpStatus.OK );
+    }
+
+    public ResponseEntity<BookingResponseDtos> findAllBookingById(Long id) {
+        List<Booking> bookings=bookingRepository.findByUserId(id);
+        BookingResponseDtos response=new BookingResponseDtos();
+        response.setBookings(new ArrayList<>());
+        for(Booking booking:bookings){
+            response.getBookings().add(BookingResponseDto.convertToUserBookingResponseDto(booking));
+        }
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

@@ -1,8 +1,11 @@
 package com.application.bookMyShow.dtos.bookingDto;
 
+import com.application.bookMyShow.dtos.movieDtos.MovieResponseDto;
 import com.application.bookMyShow.dtos.paymentDto.PaymentDto;
+import com.application.bookMyShow.dtos.showDtos.ShowResponseDto;
 import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetDto;
 import com.application.bookMyShow.models.Booking;
+import com.application.bookMyShow.models.Movie;
 import com.application.bookMyShow.models.User;
 import com.application.bookMyShow.models.enums.BookingStatus;
 import lombok.Data;
@@ -17,6 +20,7 @@ public class BookingResponseDto {
     private String bookingNumber;
     private List<ShowSheetDto> showSeats;
     private Long amount;
+    private ShowResponseDto show;
 
     private List<PaymentDto> payments;
     private BookingStatus bookingStatus;
@@ -32,6 +36,7 @@ public class BookingResponseDto {
         response.setPayments(new ArrayList<>());
         booking.getPayments().forEach(payment -> response.getPayments().add(PaymentDto.convertToPaymentDto(payment)));
         response.setBookingStatus(booking.getBookingStatus());
+        response.setShow(ShowResponseDto.convertToShowResponseDto(booking.getShow()));
         return response;
     }
 }

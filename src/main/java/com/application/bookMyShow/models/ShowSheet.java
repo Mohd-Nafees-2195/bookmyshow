@@ -18,7 +18,7 @@ public class ShowSheet extends BaseModel {
     @ManyToOne
     private Seat seat;
     private Long price;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private ShowSeatStatus showSheetStatus;
 
     @Enumerated(EnumType.ORDINAL)

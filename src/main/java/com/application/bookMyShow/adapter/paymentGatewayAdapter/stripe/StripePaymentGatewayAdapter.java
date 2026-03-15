@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StripePaymentGatewayAdapter implements PaymentGatewayAdapter {
     @Override
-    public String createPaymentLink(Long price,Long bookingId) throws Exception {
+    public String createPaymentLink(Long price,Long bookingId,Long userId) throws Exception {
 
 //        System.out.println(String.valueOf(bookingId)+" - "+bookingId);
 //        System.out.println(Long.valueOf(String.valueOf(bookingId))+" - "+bookingId);
@@ -26,7 +26,7 @@ public class StripePaymentGatewayAdapter implements PaymentGatewayAdapter {
                         .setActive(true)
                         .setDefaultPriceData(
                                 ProductCreateParams.DefaultPriceData.builder()
-                                        .setCurrency("inr")
+                                        .setCurrency("usd")
                                         .setUnitAmount(price)
                                         .build()
                         )
@@ -56,7 +56,7 @@ public class StripePaymentGatewayAdapter implements PaymentGatewayAdapter {
                                         .setType(PaymentLinkCreateParams.AfterCompletion.Type.REDIRECT)
                                         .setRedirect(
                                                 PaymentLinkCreateParams.AfterCompletion.Redirect.builder()
-                                                        .setUrl("http://localhost:5173/my-bookings")
+                                                        .setUrl("http://localhost:5173/my-bookings/"+userId)
                                                         .build()
                                         )
                                         .build()

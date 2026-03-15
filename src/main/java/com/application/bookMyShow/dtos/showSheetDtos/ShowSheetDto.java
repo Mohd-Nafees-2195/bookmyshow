@@ -11,6 +11,7 @@ public class ShowSheetDto {
     private Long id;
     private Long seatId;
     private Long price;
+    private String number;
     private ShowSeatStatus showSheetStatus;
     private SeatType seatType;
 
@@ -20,6 +21,7 @@ public class ShowSheetDto {
         response.setSeatId(showSheet.getSeat().getId());  //comment latest1
         response.setPrice(showSheet.getPrice());
         response.setShowSheetStatus(showSheet.getShowSheetStatus());
+        response.setNumber(showSheet.getSeat().getNumber());
         response.setSeatType(showSheet.getSeatType());
         return response;
     }

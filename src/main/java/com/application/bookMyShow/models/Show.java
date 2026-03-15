@@ -1,6 +1,7 @@
 package com.application.bookMyShow.models;
 
 import com.application.bookMyShow.models.enums.Feature;
+import com.application.bookMyShow.models.enums.ShowStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -31,6 +32,9 @@ public class Show extends BaseModel{
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ShowSheet> showSheets;
+
+    @Enumerated(value = EnumType.STRING)
+    private ShowStatus showStatus;
 
 //    @OneToMany(mappedBy = "show", cascade = CascadeType.ALL)
 //    private List<ShowTiming> showTimings;

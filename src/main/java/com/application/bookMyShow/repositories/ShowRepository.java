@@ -1,6 +1,7 @@
 package com.application.bookMyShow.repositories;
 
 import com.application.bookMyShow.models.Show;
+import com.application.bookMyShow.models.enums.ShowStatus;
 import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,8 @@ public interface ShowRepository extends JpaRepository<Show,Long> {
       List<Show> findByScreen_Theatre_Id(Long theatreId);
 
     List<Show> findAllByScreen_Theatre_IdIn(List<Long> theatreIds);
+
+    List<Show> findByScreenIdInAndShowStatus(List<Long> screenIds, ShowStatus showStatus);
 
     //    @Query("SELECT ms FROM MovieShow ms JOIN ms.screen sc WHERE sc.theatre.id IN :theatreIds")
     @Query(value = "SELECT ms FROM movie_show ms JOIN screen sc ON ms.screen_id = sc.id WHERE sc.theatre_id IN :theatreIds",nativeQuery = true)

@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 
 @RestController
-@RequestMapping("movies")
+@RequestMapping("/movies")
 public class MovieController {
 
     @Autowired
@@ -30,4 +30,10 @@ public class MovieController {
     public ResponseEntity<MovieResponseDtos> getAllMovie(){
         return movieService.getAllMovie();
     }
+
+    @GetMapping("/active")
+    public ResponseEntity<MovieResponseDtos> getAllActiveMovies(){
+        return movieService.getAllActiveMovies();
+    }
+
 }

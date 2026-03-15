@@ -6,6 +6,7 @@ import com.application.bookMyShow.dtos.showDtos.*;
 import com.application.bookMyShow.dtos.showSheetDtos.ShowSheetDto;
 import com.application.bookMyShow.models.*;
 import com.application.bookMyShow.repositories.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ public class ShowService {
 //    @Autowired
 //    private TheatreRepository theatreRepository;
 
+    @Transactional
     public ResponseEntity<CreateShowResponseDto> addShow(CreateShowRequestDto request) {
 
         //Fetch the movie
@@ -108,6 +110,7 @@ public class ShowService {
             }
         }
 
+        System.out.println("ajksjkndklmd");
         List<ShowSheetDto> showSheetDtos=request.getShow().getShowSheets();
         List<Seat> seats=screen.get().getSeats();
         if(seats.size()!=showSheetDtos.size()){
@@ -140,6 +143,7 @@ public class ShowService {
                 showSheets.add(showSheet);
             }
             showSheets=showSheetRepository.saveAll(showSheets);
+            newShow.setShowSheets(showSheets);
             ShowResponseDto showResponse=ShowResponseDto.convertToShowResponseDto(newShow);
             for(int j=0;j<showSheets.size();j++){
                 showSheetDtos.get(j).setSeatId(showSheets.get(j).getId());

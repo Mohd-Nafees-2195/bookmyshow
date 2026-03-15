@@ -19,6 +19,8 @@ public class MovieResponseDto {
     private Double voteAverage;
     private Date createdAt;
     private Date updatedAt;
+    private Long ratings;
+    private Long votes;
 //    private MovieStatus movieStatus;
     private List<LanguageDto> languages;
     private List<GenresDto> genres;
@@ -33,6 +35,8 @@ public class MovieResponseDto {
         response.setImagesUrl(movie.getImageUrl());
         response.setCreatedAt(movie.getCreated_at());
         response.setUpdatedAt(movie.getUpdated_at());
+        response.setRatings(movie.getRatings());
+        response.setVotes(movie.getVotes());
 
         //Get all movie languages
         List<Languages> languages=movie.getLanguages();

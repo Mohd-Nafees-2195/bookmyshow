@@ -5,6 +5,7 @@ import com.application.bookMyShow.Exceptions.InvalidLanguageException;
 import com.application.bookMyShow.Exceptions.InvalidMovieException;
 import com.application.bookMyShow.dtos.movieDtos.*;
 import com.application.bookMyShow.models.*;
+import com.application.bookMyShow.models.enums.MovieStatus;
 import com.application.bookMyShow.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -76,6 +77,17 @@ public class MovieService {
 
     public ResponseEntity<MovieResponseDtos> getAllMovie() {
         List<Movie> movies=movieRepository.findAll();
+        MovieResponseDtos response=new MovieResponseDtos();
+        response.setMovies(new ArrayList<>());
+        movies.forEach(movie -> {
+            MovieResponseDto movieDto=MovieResponseDto.convertToMovieResponseDto(movie);
+            response.getMovies().add(movieDto);
+        });
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<MovieResponseDtos> getAllActiveMovies() {
+        List<Movie> movies=movieRepository.findByMovieStatus(MovieStatus.ACTIVE);
         MovieResponseDtos response=new MovieResponseDtos();
         response.setMovies(new ArrayList<>());
         movies.forEach(movie -> {

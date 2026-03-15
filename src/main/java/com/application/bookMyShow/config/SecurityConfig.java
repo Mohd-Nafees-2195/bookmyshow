@@ -20,13 +20,19 @@ public class SecurityConfig {
         return http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        //.requestMatchers("/register","/update","/all","/book").permitAll()
+//                        .requestMatchers("/register","/update","/all","/book").permitAll()
                         .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable()) // ✅ modern style
                 .httpBasic(Customizer.withDefaults()) // enable HTTP Basic Auth
                 .build();
     }
+
+//    .authorizeHttpRequests(auth -> auth
+//            .requestMatchers("/owner/**").hasRole("OWNER")
+//    .requestMatchers("/user/**").hasRole("USER")
+//    .anyRequest().authenticated()
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

@@ -7,6 +7,7 @@ import com.application.bookMyShow.adapter.paymentGatewayAdapter.PaymentGatewaySt
 import com.application.bookMyShow.models.Booking;
 import com.application.bookMyShow.models.Payment;
 import com.application.bookMyShow.models.ShowSheet;
+import com.application.bookMyShow.models.User;
 import com.application.bookMyShow.models.enums.*;
 import com.application.bookMyShow.repositories.BookingRepository;
 import com.application.bookMyShow.repositories.PaymentRepository;
@@ -53,13 +54,14 @@ public class PaymentService {
             throw new InvalidBookingException("Invalid Booking");
         }
         Long price=Long.valueOf(booking.get().getAmount()+"00");
+        User user=booking.get().getUser();
         //2. Get payment Gateway based upon a strategy
         PaymentGatewayAdapter paymentGatewayAdapter= PaymentGatewayStrategy.getPaymentGatewayAdapter(PaymentGateway.STRIPE); //Do not pass stripe only, better to read from dp using orderId
 
         //3. Call the payment Gateway to create payment link
         String url="";
         try{
-            url=paymentGatewayAdapter.createPaymentLink(price,bookingId);
+            url=paymentGatewayAdapter.createPaymentLink(price,bookingId,user.getId());
         }catch (Exception e){
             e.printStackTrace();
             //throw new InvalidPaymentLinkCreationException("Exception while creating payment link");

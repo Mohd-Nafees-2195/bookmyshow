@@ -28,4 +28,10 @@ public class TheatreController {
     public ResponseEntity<String> deleteTheatre(@PathVariable Long id){
         return theatreService.deleteTheatre(id);
     }
+
+    //Fetching Theater Data
+    @GetMapping("/data/{id}")
+    public ResponseEntity<TheaterDataDto> getTheaterDataByOwnerId(@PathVariable Long id){
+        return theatreService.getTheaterDataByOwnerId(id);
+    }
 }

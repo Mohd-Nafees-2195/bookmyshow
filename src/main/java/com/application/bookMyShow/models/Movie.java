@@ -18,7 +18,7 @@ public class Movie extends BaseModel {
     private Long runtime;
     private String imageUrl;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private MovieStatus movieStatus;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -36,6 +36,9 @@ public class Movie extends BaseModel {
             inverseJoinColumns = @JoinColumn(name = "genres_id")
     )
     private List<Genres> genres;
+
+    private Long ratings;
+    private Long votes;
 
 //    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
 //    @JsonManagedReference(value = "movie-language")

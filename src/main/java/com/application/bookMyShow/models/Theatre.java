@@ -23,6 +23,9 @@ public class Theatre extends BaseModel{
     @ManyToOne(optional = false)
     @JoinColumn(name = "city_id",nullable = false)
     private City cityId;
+
+    @ManyToOne
+    private User user;
 }
 
 /*
